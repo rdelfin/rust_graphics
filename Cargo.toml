@@ -1,0 +1,9 @@
+[package]
+name = "maguey"
+version = "0.1.0"
+authors = ["Ricardo Delfin <me@rdelfin.com>"]
+edition = "2018"
+
+[dependencies]
+sdl2 = { version = "0.32.2", features = ["bundled", "static-link"] }
+gl = "0.10.0"
