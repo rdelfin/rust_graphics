@@ -1,4 +1,5 @@
 #[macro_use] extern crate failure;
+#[macro_use] extern crate render_gl_derive;
 
 extern crate gl;
 extern crate sdl2;
@@ -11,24 +12,16 @@ use resources::Resources;
 use std::path::Path;
 use failure::err_msg;
 
+#[derive(VertexAttribPointers)]
+#[derive(Copy, Clone, Debug)]
+#[repr(C, packed)]
 struct Vertex {
     #[allow(dead_code)]
+    #[location = 0]
     pos: data::f32_f32_f32,
     #[allow(dead_code)]
+    #[location = 1]
     clr: data::f32_f32_f32,
-}
-
-impl Vertex {
-    fn vertex_attrib_pointers(gl: &gl::Gl) {
-        let stride = std::mem::size_of::<Self>();  // byte offset between consecutive attributes
-
-        unsafe {
-            data::f32_f32_f32::vertex_attrib_pointer(gl, stride, 0, 0);
-            data::f32_f32_f32::vertex_attrib_pointer(
-                gl, stride, 1, std::mem::size_of::<data::f32_f32_f32>()
-            );
-        }
-    }
 }
 
 fn main() {
@@ -97,7 +90,9 @@ fn run() -> Result<(), failure::Error> {
     unsafe {
         gl.BindVertexArray(vao);
         gl.BindBuffer(gl::ARRAY_BUFFER, vbo);
+    }
         Vertex::vertex_attrib_pointers(&gl);
+    unsafe {
         gl.BindBuffer(gl::ARRAY_BUFFER, 0);
         gl.BindVertexArray(0);
     }
