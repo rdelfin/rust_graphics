@@ -4,19 +4,23 @@ use std;
 use std::ffi::{CStr, CString};
 
 
-#[derive(Debug)]
+#[derive(Debug, Fail)] // derive Fail, in addition to Debug
 pub enum Error {
+    #[fail(display = "Failed to load resource {}", name)]
     ResourceLoad {
         name: String,
-        inner: resources::Error,
+        #[cause] inner: resources::Error,
     },
+    #[fail(display = "Can not determine shader type for resource {}", name)]
     CanNotDetermineShaderTypeForResource {
         name: String,
     },
+    #[fail(display = "Failed to compile shader {}: {}", name, message)]
     CompileError {
         name: String,
         message: String,
     },
+    #[fail(display = "Failed to link program {}: {}", name, message)]
     LinkError {
         name: String,
         message: String,
