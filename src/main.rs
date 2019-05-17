@@ -7,6 +7,7 @@ extern crate sdl2;
 pub mod render_gl;
 pub mod resources;
 
+use render_gl::buffer;
 use render_gl::data;
 use resources::Resources;
 use std::path::Path;
@@ -52,11 +53,6 @@ fn run() -> Result<(), failure::Error> {
         |s| video_subsystem.gl_get_proc_address(s) as *const std::os::raw::c_void
     );
 
-    unsafe {
-        gl.Viewport(0, 0, 800, 600);
-        gl.ClearColor(0.392156863, 0.584313725, 0.929411765, 1.0);
-    }
-
     let shader_program = render_gl::Program::from_res(
         &gl, &res, "shaders/triangle"
     )?;
@@ -69,34 +65,23 @@ fn run() -> Result<(), failure::Error> {
         Vertex{ pos: (0.0,   0.5, 0.0).into(), clr: (0.0, 0.0, 1.0).into() },
     ];
 
-    let mut vbo: gl::types::GLuint = 0;
-    unsafe { gl.GenBuffers(1, &mut vbo) };
+    let vbo = buffer::ArrayBuffer::new(&gl);
+    vbo.bind();
+    vbo.static_draw_data(&vertices);
+    vbo.unbind();
+
+    let vao = buffer::VertexArray::new(&gl);
+
+    vao.bind();
+    vbo.bind();
+    Vertex::vertex_attrib_pointers(&gl);
+    vbo.unbind();
+    vao.unbind();
 
     unsafe {
-        gl.BindBuffer(gl::ARRAY_BUFFER, vbo);
-        gl.BufferData(
-            gl::ARRAY_BUFFER,  // Target
-            // Size of data in bytes
-            (vertices.len() * std::mem::size_of::<Vertex>()) as gl::types::GLsizeiptr,
-            vertices.as_ptr() as *const gl::types::GLvoid,  // Pointer to data
-            gl::STATIC_DRAW,
-        );
-        gl.BindBuffer(gl::ARRAY_BUFFER, 0);  // Unbind the buffer
+        gl.Viewport(0, 0, 800, 600);
+        gl.ClearColor(0.392156863, 0.584313725, 0.929411765, 1.0);
     }
-
-    let mut vao: gl::types::GLuint = 0;
-    unsafe { gl.GenVertexArrays(1, &mut vao) };
-
-    unsafe {
-        gl.BindVertexArray(vao);
-        gl.BindBuffer(gl::ARRAY_BUFFER, vbo);
-    }
-        Vertex::vertex_attrib_pointers(&gl);
-    unsafe {
-        gl.BindBuffer(gl::ARRAY_BUFFER, 0);
-        gl.BindVertexArray(0);
-    }
-
 
     let mut event_pump = sdl.event_pump().map_err(err_msg)?;
     'main: loop {
@@ -106,10 +91,15 @@ fn run() -> Result<(), failure::Error> {
                 _ => {}
             }
         }
-        shader_program.set_used();
+
         unsafe {
             gl.Clear(gl::COLOR_BUFFER_BIT);
-            gl.BindVertexArray(vao);
+        }
+
+        shader_program.set_used();
+        vao.bind();
+
+        unsafe {
             gl.DrawArrays(
                 gl::TRIANGLES,  // mode
                 0,  // starting index in the enabled arrays
