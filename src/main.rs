@@ -3,7 +3,7 @@
 
 extern crate gl;
 extern crate sdl2;
-extern crate nalgebra;
+extern crate nalgebra_glm;
 
 pub mod render_gl;
 pub mod resources;
@@ -13,7 +13,7 @@ mod debug;
 use resources::Resources;
 use std::path::Path;
 use failure::err_msg;
-use nalgebra as na;
+use nalgebra_glm as glm;
 
 fn main() {
     if let Err(e) = run() {
@@ -31,7 +31,7 @@ fn run() -> Result<(), failure::Error> {
 
     let mut viewport = render_gl::Viewport::for_window(800, 600);
     let color_buffer = render_gl::ColorBuffer::from_color(
-        na::Vector3::new(0.392156863, 0.584313725, 0.929411765)
+        glm::Vec3::new(0.392156863, 0.584313725, 0.929411765)
     );
 
     gl_attr.set_context_profile(sdl2::video::GLProfile::Core);

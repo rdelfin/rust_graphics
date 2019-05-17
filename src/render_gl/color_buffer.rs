@@ -1,19 +1,19 @@
-use nalgebra as na;
+use nalgebra_glm as glm;
 use gl;
 
 pub struct ColorBuffer {
-    pub color: na::Vector4<f32>,
+    pub color: glm::Vec4,
 }
 
 impl ColorBuffer {
-    pub fn from_color(color: na::Vector3<f32>) -> ColorBuffer {
+    pub fn from_color(color: glm::Vec3) -> ColorBuffer {
         ColorBuffer {
-            color: color.fixed_resize::<na::U4, na::U1>(1.0),
+            color: glm::Vec4::new(color.x, color.y, color.z, 1.0),
         }
     }
 
-    pub fn update_color(&mut self, color: na::Vector3<f32>) {
-        self.color = color.fixed_resize::<na::U4, na::U1>(1.0);
+    pub fn update_color(&mut self, color: glm::Vec3) {
+        self.color = glm::Vec4::new(color.x, color.y, color.z, 1.0);
     }
 
     pub fn set_used(&self, gl: &gl::Gl) {
