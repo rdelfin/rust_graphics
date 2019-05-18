@@ -72,6 +72,10 @@ impl Triangle {
 
     }
 
+    pub fn get_program_id(&self) -> gl::types::GLuint {
+        self.program.id()
+    }
+
     pub fn render(&self, gl: &gl::Gl) {
         self.program.set_used();
         self.vao.bind();

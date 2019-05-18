@@ -28,8 +28,6 @@ fn run() -> Result<(), failure::Error> {
     let video_subsystem = sdl.video().map_err(err_msg)?;
 
     let gl_attr = video_subsystem.gl_attr();
-
-    let mut viewport = render_gl::Viewport::for_window(800, 600);
     let color_buffer = render_gl::ColorBuffer::from_color(
         glm::Vec3::new(0.392156863, 0.584313725, 0.929411765)
     );
@@ -46,6 +44,15 @@ fn run() -> Result<(), failure::Error> {
     let _gl_context = window.gl_create_context().map_err(err_msg)?;
     let gl = gl::Gl::load_with(
         |s| video_subsystem.gl_get_proc_address(s) as *const std::os::raw::c_void
+    );
+
+    let mut viewport = render_gl::Viewport::for_window(
+        &gl,
+        800,
+        600,
+        glm::vec3(0.0, 1.0, 0.0),
+        glm::vec3(0.0, 0.0, 0.0),
+        glm::vec3(0.0, -2.0, 1.0),
     );
 
     let triangle = triangle::Triangle::new(&res, &gl)?;
@@ -70,6 +77,7 @@ fn run() -> Result<(), failure::Error> {
         }
 
         color_buffer.clear(&gl);
+        viewport.apply_uniforms(triangle.get_program_id());
         triangle.render(&gl);
 
         window.gl_swap_window();
