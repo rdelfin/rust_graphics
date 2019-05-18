@@ -77,7 +77,7 @@ fn run() -> Result<(), failure::Error> {
         }
 
         color_buffer.clear(&gl);
-        viewport.apply_uniforms(triangle.get_program_id());
+        viewport.apply_uniforms(triangle.get_program_id())?;
         triangle.render(&gl);
 
         window.gl_swap_window();

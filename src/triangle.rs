@@ -15,7 +15,7 @@ struct Vertex {
 
 pub struct Triangle {
     program: render_gl::Program,
-    _vbo: buffer::ArrayBuffer,  // _ to disable warning about not used vbo
+    _vbo: buffer::ArrayBuffer,
     vao: buffer::VertexArray,
 }
 

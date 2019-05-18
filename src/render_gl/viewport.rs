@@ -1,7 +1,15 @@
 use gl;
 use nalgebra_glm as glm;
 use super::uniform::UniformFMat4;
-use crate::render_gl::uniform::Uniform;
+use crate::render_gl::uniform::{Uniform, Error as UniformError};
+
+#[derive(Debug, Fail)]
+pub enum Error {
+    #[fail(display = "Failed to apply uniforms")]
+    ResourceLoad {
+        #[cause] inner: UniformError,
+    },
+}
 
 pub struct Viewport {
     pub x: i32,
@@ -62,10 +70,14 @@ impl Viewport {
         self.view_uniform.update(&glm::look_at(&self.position, &self.center, &self.up));
     }
 
-    pub fn apply_uniforms(&self, program_id: gl::types::GLuint) {
-        self.view_uniform.apply_uniform(program_id);
-        self.proj_uniform.apply_uniform(program_id);
-
+    pub fn apply_uniforms(&mut self, program_id: gl::types::GLuint) -> Result<(), Error> {
+        self.view_uniform.apply_uniform(program_id).map_err(
+            |e| Error::ResourceLoad { inner: e }
+        )?;
+        self.proj_uniform.apply_uniform(program_id).map_err(
+            |e| Error::ResourceLoad { inner: e }
+        )?;
+        Ok(())
     }
 
     pub fn for_window(

@@ -5,8 +5,8 @@ precision mediump float;
 layout (location = 0) in vec3 Position;
 layout (location = 1) in vec3 Color;
 
-uniform mat4 projection;
-uniform mat4 view;
+layout (location = 1) uniform mat4 view;
+layout (location = 2) uniform mat4 projection;
 
 out VS_OUTPUT {
     vec3 Color;
