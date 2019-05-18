@@ -28,17 +28,29 @@ impl Triangle {
 
         let vertices: Vec<Vertex> = vec![
             Vertex {
+                pos: (-0.5, -0.5, 0.0).into(),
+                clr: (0.0, 1.0, 0.0).into(),
+            },  // bottom left
+            Vertex {
                 pos: (0.5, -0.5, 0.0).into(),
                 clr: (1.0, 0.0, 0.0).into(),
             },  // bottom right
+            Vertex {
+                pos: (0.5, 0.5, 0.0).into(),
+                clr: (0.0, 0.0, 1.0).into(),
+            },  // top right
             Vertex {
                 pos: (-0.5, -0.5, 0.0).into(),
                 clr: (0.0, 1.0, 0.0).into(),
             },  // bottom left
             Vertex {
-                pos: (0.0, 0.5, 0.0).into(),
+                pos: (0.5, 0.5, 0.0).into(),
                 clr: (0.0, 0.0, 1.0).into(),
-            },  // top
+            },  // top right
+            Vertex {
+                pos: (-0.5, 0.5, 0.0).into(),
+                clr: (1.0, 1.0, 0.0).into(),
+            }
         ];
 
         let vbo = buffer::ArrayBuffer::new(&gl);
@@ -68,7 +80,7 @@ impl Triangle {
             gl.DrawArrays(
                 gl::TRIANGLES,  // mode
                 0,  // starting index in the enabled arrays
-                3,  // number of indices to be rendered
+                6,  // number of indices to be rendered
             );
         }
     }
