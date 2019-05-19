@@ -8,6 +8,7 @@ extern crate nalgebra_glm;
 pub mod render_gl;
 pub mod resources;
 mod triangle;
+mod mesh;
 mod debug;
 
 use resources::Resources;
@@ -29,7 +30,7 @@ fn run() -> Result<(), failure::Error> {
 
     let gl_attr = video_subsystem.gl_attr();
     let color_buffer = render_gl::ColorBuffer::from_color(
-        glm::Vec3::new(0.392156863, 0.584313725, 0.929411765)
+        glm::Vec3::new(0.0, 0.0, 0.0)
     );
 
     gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
@@ -52,10 +53,18 @@ fn run() -> Result<(), failure::Error> {
         600,
         glm::vec3(0.0, 1.0, 0.0),
         glm::vec3(0.0, 0.0, 0.0),
-        glm::vec3(0.0, -2.0, 1.0),
+        glm::vec3(0.0, -1.0, -1.5),
     );
 
-    let triangle = triangle::Triangle::new(&res, &gl)?;
+    // let triangle = triangle::Triangle::new(&res, &gl)?;
+    let mesh = mesh::Mesh::new(
+        &res,
+        &gl,
+        glm::vec3(-1.0, 0.0, -1.0),
+        glm::vec3(1.0, 0.0, 1.0),
+        glm::vec3(0.0, 1.0, 0.0),
+        100,
+    )?;
 
     viewport.set_used(&gl);
     color_buffer.set_used(&gl);
@@ -77,8 +86,8 @@ fn run() -> Result<(), failure::Error> {
         }
 
         color_buffer.clear(&gl);
-        viewport.apply_uniforms(triangle.get_program_id())?;
-        triangle.render(&gl);
+        viewport.apply_uniforms(mesh.get_program_id())?;
+        mesh.render(&gl);
 
         window.gl_swap_window();
     }
