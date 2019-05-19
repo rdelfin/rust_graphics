@@ -21,7 +21,11 @@ pub struct UniformFMat4 {
 
 impl UniformFMat4 {
     pub fn new(gl: &gl::Gl, name: &str, data: glm::Mat4) -> UniformFMat4 {
-        return UniformFMat4 { gl: gl.clone(), name: name.to_string(), data, location: -1 }
+        UniformFMat4 { gl: gl.clone(), name: name.to_string(), data, location: -1 }
+    }
+
+    pub fn new_with_loc(gl: &gl::Gl, name: &str, data: glm::Mat4, loc: i32) -> UniformFMat4 {
+        UniformFMat4 { gl: gl.clone(), name: name.to_string(), data, location: loc }
     }
 
     pub fn update(&mut self, data: &glm::Mat4) {

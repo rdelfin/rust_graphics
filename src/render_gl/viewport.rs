@@ -93,18 +93,18 @@ impl Viewport {
             center: glm::vec3(0.0, 0.0, 0.0),
             position: glm::vec3(0.0, 0.0, 0.0),
             forwards: glm::vec3(0.0, 0.0, 0.0),
-            proj_uniform: UniformFMat4::new(gl, "projection", glm::mat4(
+            proj_uniform: UniformFMat4::new_with_loc(gl, "projection", glm::mat4(
                 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0,
-            )),
-            view_uniform: UniformFMat4::new(gl, "view", glm::mat4(
+            ), 1),
+            view_uniform: UniformFMat4::new_with_loc(gl, "view", glm::mat4(
                 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0,
-            )),
+            ), 1),
         };
 
         viewport.update_placement(up, center, position);
