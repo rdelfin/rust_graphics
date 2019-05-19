@@ -12,7 +12,9 @@ mod mesh;
 mod debug;
 
 use resources::Resources;
+use std::f32::consts::PI;
 use std::path::Path;
+use std::time::SystemTime;
 use failure::err_msg;
 use nalgebra_glm as glm;
 
@@ -23,6 +25,7 @@ fn main() {
 }
 
 fn run() -> Result<(), failure::Error> {
+    let start_time = SystemTime::now();
     let res = Resources::from_relative_exe_path(Path::new("assets-07"))?;
 
     let sdl = sdl2::init().map_err(err_msg)?;
@@ -57,13 +60,13 @@ fn run() -> Result<(), failure::Error> {
     );
 
     // let triangle = triangle::Triangle::new(&res, &gl)?;
-    let mesh = mesh::Mesh::new(
+    let mut mesh = mesh::Mesh::new(
         &res,
         &gl,
         glm::vec3(-1.0, 0.0, -1.0),
         glm::vec3(1.0, 0.0, 1.0),
         glm::vec3(0.0, 1.0, 0.0),
-        100,
+        50,
     )?;
 
     viewport.set_used(&gl);
@@ -84,6 +87,18 @@ fn run() -> Result<(), failure::Error> {
                 _ => {},
             }
         }
+
+        let time_in_sec = SystemTime::now()
+            .duration_since(start_time)
+            .expect("Time went backwards")
+            .as_millis() as f32 / 1000.0_f32;
+        let t = time_in_sec;
+
+        mesh.update_vertices(
+            |x: f32, y: f32| -> f32 {
+                (x * 2.0*PI * 5.0 + t).sin() / 10.0 + (y * 2.0*PI * 5.0 + t).sin() / 10.0
+            }
+        );
 
         color_buffer.clear(&gl);
         viewport.apply_uniforms(mesh.get_program_id())?;

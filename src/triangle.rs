@@ -55,7 +55,7 @@ impl Triangle {
 
         let vbo = buffer::ArrayBuffer::new(&gl);
         vbo.bind();
-        vbo.static_draw_data(&vertices);
+        vbo.dynamic_draw_data(&vertices);
         vbo.unbind();
 
         // Setup vertex array buffer
