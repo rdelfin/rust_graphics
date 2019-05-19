@@ -98,7 +98,7 @@ impl Viewport {
                 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0,
-            ), 1),
+            ), 2),
             view_uniform: UniformFMat4::new_with_loc(gl, "view", glm::mat4(
                 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0,
