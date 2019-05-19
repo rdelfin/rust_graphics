@@ -68,17 +68,10 @@ impl Mesh {
             self.start, self.end, self.norm, self.num_steps, f
         );
 
-        for idx in 0..self.vertices.len() {
-            self.vertices[idx].pos.d0 = vertices[idx].pos.d0;
-            self.vertices[idx].pos.d1 = vertices[idx].pos.d1;
-            self.vertices[idx].pos.d2 = vertices[idx].pos.d2;
-            self.vertices[idx].clr.d0 = vertices[idx].clr.d0;
-            self.vertices[idx].clr.d1 = vertices[idx].clr.d1;
-            self.vertices[idx].clr.d2 = vertices[idx].clr.d2;
-        }
+        self.vertices = vertices;
 
         self.vbo.bind();
-        self.vbo.dynamic_draw_data(&vertices);
+        self.vbo.dynamic_draw_data(&self.vertices);
         self.vbo.unbind();
     }
 
