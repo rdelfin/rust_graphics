@@ -16,7 +16,7 @@ struct Vertex {
     offset: data::one_f32,
 }
 
-pub struct Mesh {
+pub struct Grid {
     program: render_gl::Program,
     vbo: buffer::ArrayBuffer,
     vao: buffer::VertexArray,
@@ -25,17 +25,17 @@ pub struct Mesh {
     num_steps: i32,
 }
 
-impl Mesh {
+impl Grid {
     pub fn new(
         res: &Resources,
         gl: &gl::Gl,
         scale: f32,
         num_steps: i32
-    ) -> Result<Mesh, failure::Error> {
+    ) -> Result<Grid, failure::Error> {
         // Setup shader program
         let program = render_gl::Program::from_res(gl, res, "shaders/grid")?;
 
-        let vertices = Mesh::generate_vertices(
+        let vertices = Grid::generate_vertices(
             scale, num_steps, |_x, _y| { 0.0_f32 },
         );
 
@@ -53,7 +53,7 @@ impl Mesh {
         vbo.unbind();
         vao.unbind();
 
-        Ok(Mesh{program, vbo, vao, vertices, _scale: scale, num_steps})
+        Ok(Grid{program, vbo, vao, vertices, _scale: scale, num_steps})
     }
 
     pub fn get_program_id(&self) -> gl::types::GLuint {

@@ -8,7 +8,7 @@ extern crate nalgebra_glm;
 pub mod render_gl;
 pub mod resources;
 mod triangle;
-mod mesh;
+mod grid;
 mod debug;
 
 use resources::Resources;
@@ -56,11 +56,11 @@ fn run() -> Result<(), failure::Error> {
         600,
         glm::vec3(0.0, 1.0, 0.0),
         glm::vec3(0.0, 0.0, 0.0),
-        glm::vec3(0.0, 1.0, -1.5),
+        glm::vec3(0.0, 1.0, -2.0),
     );
 
     // let triangle = triangle::Triangle::new(&res, &gl)?;
-    let mut mesh = mesh::Mesh::new(&res, &gl, 1.0, 100)?;
+    let mut grid = grid::Grid::new(&res, &gl, 1.0, 100)?;
 
     viewport.set_used(&gl);
     color_buffer.set_used(&gl);
@@ -87,15 +87,15 @@ fn run() -> Result<(), failure::Error> {
             .as_millis() as f32 / 1000.0_f32;
         let t = time_in_sec;
 
-        mesh.update_vertices(
+        grid.update_vertices(
             |x: f32, y: f32| -> f32 {
                 (x * 2.0*PI * 2.0 + t).sin() / 10.0 + (y * 2.0*PI * 2.0 + t).sin() / 10.0
             }
         );
 
         color_buffer.clear(&gl);
-        viewport.apply_uniforms(mesh.get_program_id())?;
-        mesh.render(&gl);
+        viewport.apply_uniforms(grid.get_program_id())?;
+        grid.render(&gl);
 
         window.gl_swap_window();
     }
