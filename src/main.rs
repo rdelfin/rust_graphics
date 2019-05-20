@@ -56,18 +56,11 @@ fn run() -> Result<(), failure::Error> {
         600,
         glm::vec3(0.0, 1.0, 0.0),
         glm::vec3(0.0, 0.0, 0.0),
-        glm::vec3(0.0, -1.0, -1.5),
+        glm::vec3(0.0, 1.0, -1.5),
     );
 
     // let triangle = triangle::Triangle::new(&res, &gl)?;
-    let mut mesh = mesh::Mesh::new(
-        &res,
-        &gl,
-        glm::vec3(-1.0, 0.0, -1.0),
-        glm::vec3(1.0, 0.0, 1.0),
-        glm::vec3(0.0, 1.0, 0.0),
-        50,
-    )?;
+    let mut mesh = mesh::Mesh::new(&res, &gl, 1.0, 100)?;
 
     viewport.set_used(&gl);
     color_buffer.set_used(&gl);
@@ -96,7 +89,7 @@ fn run() -> Result<(), failure::Error> {
 
         mesh.update_vertices(
             |x: f32, y: f32| -> f32 {
-                (x * 2.0*PI * 5.0 + t).sin() / 10.0 + (y * 2.0*PI * 5.0 + t).sin() / 10.0
+                (x * 2.0*PI * 2.0 + t).sin() / 10.0 + (y * 2.0*PI * 2.0 + t).sin() / 10.0
             }
         );
 
