@@ -106,7 +106,7 @@ impl Grid {
                 let scaled_y = y_f * scale as f32;
 
                 vertices.push(Vertex {
-                    pos: (scaled_x, scaled_y, 0.0).into(),
+                    pos: (scaled_x, 0.0, scaled_y).into(),
                     clr: (1.0, 0.0, 0.0).into(),
                     offset: f(x_f, y_f).into(),
                 });

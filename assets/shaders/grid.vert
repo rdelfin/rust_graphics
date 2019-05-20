@@ -15,6 +15,6 @@ out VS_OUTPUT {
 
 void main()
 {
-    gl_Position = projection * view * vec4(Position.x, Position.y, Position.z + Offset, 1.0);
+    gl_Position = projection * view * vec4(Position.x, Position.y + Offset, Position.z, 1.0);
     OUT.Color = Color;
 }

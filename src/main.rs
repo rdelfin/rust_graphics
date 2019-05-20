@@ -56,7 +56,7 @@ fn run() -> Result<(), failure::Error> {
         600,
         glm::vec3(0.0, 1.0, 0.0),
         glm::vec3(0.0, 0.0, 0.0),
-        glm::vec3(0.0, 1.0, -2.0),
+        glm::vec3(2.0, -1.0, 0.0),
     );
 
     // let triangle = triangle::Triangle::new(&res, &gl)?;
