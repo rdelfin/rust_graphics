@@ -10,6 +10,7 @@ pub mod resources;
 mod triangle;
 mod grid;
 mod debug;
+mod wave_estimator;
 
 use resources::Resources;
 use std::f32::consts::PI;
@@ -25,6 +26,7 @@ fn main() {
 }
 
 fn run() -> Result<(), failure::Error> {
+    let initial_screen = (1280, 800);
     let start_time = SystemTime::now();
     let res = Resources::from_relative_exe_path(Path::new("assets-07"))?;
 
@@ -40,7 +42,7 @@ fn run() -> Result<(), failure::Error> {
     gl_attr.set_context_version(4, 1);
 
     let window = video_subsystem
-        .window("Game", 800, 600)
+        .window("Game", initial_screen.0, initial_screen.1)
         .opengl()
         .resizable()
         .build()?;
@@ -52,15 +54,22 @@ fn run() -> Result<(), failure::Error> {
 
     let mut viewport = render_gl::Viewport::for_window(
         &gl,
-        800,
-        600,
-        glm::vec3(0.0, 1.0, 0.0),
+        initial_screen.0 as i32,
+        initial_screen.1 as i32,
+        glm::vec3(0.0, -1.0, 0.0),
         glm::vec3(0.0, 0.0, 0.0),
-        glm::vec3(2.0, -1.0, 0.0),
+        glm::vec3(2.0, 2.0, 0.0),
     );
 
     // let triangle = triangle::Triangle::new(&res, &gl)?;
-    let mut grid = grid::Grid::new(&res, &gl, 1.0, 100)?;
+    let mut grid = grid::Grid::new(&res, &gl, 1.0, 30)?;
+    let mut estimator = wave_estimator::WaveEstimator::new(30, 1.0, |x, y| {
+        let lim = 1.0 / 30.0;
+        if x < 3.0*lim && x > -3.0*lim && y < 3.0*lim && y > -3.0*lim {
+            return 1.0;
+        }
+        return 0.0;
+    });
 
     viewport.set_used(&gl);
     color_buffer.set_used(&gl);
@@ -81,17 +90,15 @@ fn run() -> Result<(), failure::Error> {
             }
         }
 
+        estimator.update(0.01);
+
         let time_in_sec = SystemTime::now()
             .duration_since(start_time)
             .expect("Time went backwards")
             .as_millis() as f32 / 1000.0_f32;
         let t = time_in_sec;
 
-        grid.update_vertices(
-            |x: f32, y: f32| -> f32 {
-                (x * 2.0*PI * 2.0 + t).sin() / 10.0 + (y * 2.0*PI * 2.0 + t).sin() / 10.0
-            }
-        );
+        grid.update_vertices(|x, y| { estimator.get_val(x, y) });
 
         color_buffer.clear(&gl);
         viewport.apply_uniforms(grid.get_program_id())?;
