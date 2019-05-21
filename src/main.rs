@@ -58,7 +58,7 @@ fn run() -> Result<(), failure::Error> {
         initial_screen.1 as i32,
         glm::vec3(0.0, -1.0, 0.0),
         glm::vec3(0.0, 0.0, 0.0),
-        glm::vec3(2.0, 2.0, 0.0),
+        glm::vec3(1.5, 1.5, 1.5),
     );
 
     // let triangle = triangle::Triangle::new(&res, &gl)?;
