@@ -98,7 +98,9 @@ fn run() -> Result<(), failure::Error> {
             .as_millis() as f32 / 1000.0_f32;
         let t = time_in_sec;
 
-        grid.update_vertices(|x, y| { estimator.get_val(x, y) });
+        grid.update_vertices(|x, y| {
+            estimator.get_val(x, y)
+        });
 
         color_buffer.clear(&gl);
         viewport.apply_uniforms(grid.get_program_id())?;

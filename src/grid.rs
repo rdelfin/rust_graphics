@@ -61,12 +61,14 @@ impl Grid {
     }
 
     pub fn update_vertices(&mut self, f: impl Fn(f32, f32) -> f32) {
-        for x in 0..self.num_steps {
-            for y in 0..self.num_steps {
-                let x_f = 2.0 * (x as f32 / (self.num_steps as f32)) - 1.0;
-                let y_f = 2.0 * (y as f32 / (self.num_steps as f32)) - 1.0;
+        let mut idx = 0;
+        for x in -self.num_steps..(self.num_steps+1) {
+            for y in -self.num_steps..(self.num_steps+1) {
+                let x_f = x as f32 / (self.num_steps as f32);
+                let y_f = y as f32 / (self.num_steps as f32);
 
-                self.vertices[(y + x*self.num_steps) as usize].offset = f(x_f, y_f).into();
+                self.vertices[idx].offset = f(x_f, y_f).into();
+                idx += 1;
             }
         }
 
@@ -97,10 +99,10 @@ impl Grid {
 
         let mut vertices: Vec<Vertex> = Vec::new();
 
-        for x in 0..num_steps {
-            for y in 0..num_steps {
-                let x_f = 2.0 * (x as f32 / (num_steps as f32)) - 1.0;
-                let y_f = 2.0 * (y as f32 / (num_steps as f32)) - 1.0;
+        for x in -num_steps..(num_steps+1) {
+            for y in -num_steps..(num_steps+1) {
+                let x_f = x as f32 / (num_steps as f32);
+                let y_f = y as f32 / (num_steps as f32);
 
                 let scaled_x = x_f * scale as f32;
                 let scaled_y = y_f * scale as f32;
