@@ -86,6 +86,31 @@ fn run() -> Result<(), failure::Error> {
                     viewport.update_size(w, h);
                     viewport.set_used(&gl);
                 },
+                sdl2::event::Event::MouseMotion {
+                    x,
+                    y,
+                    xrel,
+                    yrel,
+                    ..
+                } => {
+                    println!("MOUSE MOVED. delta: {}, {}", xrel, yrel);
+                },
+                sdl2::event::Event::MouseButtonDown {
+                    mouse_btn,
+                    ..
+                } => {
+                    println!("BUTTON DOWN: {:?}", mouse_btn);
+                },
+                sdl2::event::Event::MouseButtonUp {
+                    mouse_btn,
+                    ..
+                } => {
+                    println!("BUTTON UP: {:?}", mouse_btn);
+                },
+                sdl2::event::Event::KeyUp {
+                    keycode: Some(sdl2::keyboard::Keycode::Escape),
+                    ..
+                } => break 'main,
                 _ => {},
             }
         }
