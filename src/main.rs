@@ -38,6 +38,8 @@ fn run() -> Result<(), failure::Error> {
         glm::Vec3::new(0.0, 0.0, 0.0)
     );
 
+    let mut dragging = false;
+
     gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
     gl_attr.set_context_version(4, 1);
 
@@ -86,15 +88,18 @@ fn run() -> Result<(), failure::Error> {
                     viewport.update_size(w, h);
                     viewport.set_used(&gl);
                 },
-                sdl2::event::Event::MouseMotion {
-                    x,
-                    y,
-                    xrel,
-                    yrel,
+                sdl2::event::Event::MouseButtonDown {
+                    mouse_btn: sdl2::mouse::MouseButton::Left,
                     ..
                 } => {
-                    println!("MOUSE MOVED. delta: {}, {}", xrel, yrel);
+                    dragging = true;
                 },
+                sdl2::event::Event::MouseButtonUp {
+                    mouse_btn: sdl2::mouse::MouseButton::Left,
+                    ..
+                } => {
+                    dragging = false;
+                }
                 sdl2::event::Event::MouseButtonDown {
                     mouse_btn,
                     ..
@@ -106,6 +111,15 @@ fn run() -> Result<(), failure::Error> {
                     ..
                 } => {
                     println!("BUTTON UP: {:?}", mouse_btn);
+                },
+                sdl2::event::Event::MouseMotion {
+                    xrel,
+                    yrel,
+                    ..
+                } => {
+                    if dragging {
+                        viewport.rotate_by(xrel as f32, yrel as f32, 5.0);
+                    }
                 },
                 sdl2::event::Event::KeyUp {
                     keycode: Some(sdl2::keyboard::Keycode::Escape),

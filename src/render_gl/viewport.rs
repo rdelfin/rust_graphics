@@ -50,6 +50,16 @@ impl Viewport {
         unsafe { gl.Viewport(self.x, self.y, self.w, self.h) };
     }
 
+    pub fn rotate_by(&mut self, x: f32, y: f32, speed: f32) {
+        let temp_pos = glm::rotate_vec3(
+            &self.position, x / self.w as f32 * speed, &self.up
+        );
+        self.position = glm::rotate_vec3(
+            &temp_pos, -y / self.h as f32 * speed, &self.left
+        );
+        self.update_placement(self.up, self.center, self.position);
+    }
+
     pub fn clean(&self, gl: &gl::Gl) {
         unsafe { gl.Clear(gl::COLOR_BUFFER_BIT) };
     }
