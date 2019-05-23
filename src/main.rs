@@ -65,12 +65,8 @@ fn run() -> Result<(), failure::Error> {
 
     // let triangle = triangle::Triangle::new(&res, &gl)?;
     let mut grid = grid::Grid::new(&res, &gl, 1.0, 30)?;
-    let mut estimator = wave_estimator::WaveEstimator::new(30, 1.0, |x, y| {
-        let lim = 1.0 / 30.0;
-        if x < 3.0*lim && x > -3.0*lim && y < 3.0*lim && y > -3.0*lim {
-            return 1.0;
-        }
-        return 0.0;
+    let mut estimator = wave_estimator::WaveEstimator::new(30, 5.0, |x, y| {
+        0.2 * f32::sin(2.0 * std::f32::consts::PI*(x+1.0)) * f32::sin(2.0 * std::f32::consts::PI*(y+1.0))
     });
 
     viewport.set_used(&gl);
