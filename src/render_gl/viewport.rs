@@ -33,6 +33,16 @@ impl Viewport {
         self.update_placement(self.up, self.center, self.position);
     }
 
+    pub fn rotate_by(&mut self, x: f32, y: f32, speed: f32) {
+        let temp_pos = glm::rotate_vec3(
+            &self.position, x / self.w as f32 * speed, &self.up
+        );
+        self.position = glm::rotate_vec3(
+            &temp_pos, -y / self.h as f32 * speed, &self.left
+        );
+        self.update_placement(self.up, self.center, self.position);
+    }
+
     pub fn update_placement(&mut self, up: glm::Vec3, center: glm::Vec3, position: glm::Vec3) {
         self.position = position;
         self.center = center;
@@ -48,16 +58,6 @@ impl Viewport {
 
     pub fn set_used(&self, gl: &gl::Gl) {
         unsafe { gl.Viewport(self.x, self.y, self.w, self.h) };
-    }
-
-    pub fn rotate_by(&mut self, x: f32, y: f32, speed: f32) {
-        let temp_pos = glm::rotate_vec3(
-            &self.position, x / self.w as f32 * speed, &self.up
-        );
-        self.position = glm::rotate_vec3(
-            &temp_pos, -y / self.h as f32 * speed, &self.left
-        );
-        self.update_placement(self.up, self.center, self.position);
     }
 
     pub fn clean(&self, gl: &gl::Gl) {
