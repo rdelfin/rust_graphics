@@ -43,6 +43,11 @@ impl Viewport {
         self.update_placement(self.up, self.center, self.position);
     }
 
+    pub fn zoom(&mut self, zoom: f32) {
+        self.position = zoom*(self.position - self.center) + self.center;
+        self.update_placement(self.up, self.center, self.position);
+    }
+
     pub fn update_placement(&mut self, up: glm::Vec3, center: glm::Vec3, position: glm::Vec3) {
         self.position = position;
         self.center = center;

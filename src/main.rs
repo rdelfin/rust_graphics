@@ -121,6 +121,13 @@ fn run() -> Result<(), failure::Error> {
                         viewport.rotate_by(xrel as f32, yrel as f32, 5.0);
                     }
                 },
+                sdl2::event::Event::MouseWheel {
+                    x,
+                    y,
+                    ..
+                } => {
+                    viewport.zoom((y as f32 / 10.0).exp());
+                },
                 sdl2::event::Event::KeyUp {
                     keycode: Some(sdl2::keyboard::Keycode::Escape),
                     ..
