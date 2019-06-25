@@ -49,17 +49,11 @@ impl game::BaseGame for Game {
         Ok(())
     }
 
-    fn update(&mut self, viewport: &mut Viewport) -> Result<(), failure::Error> {
+    fn update(&mut self, _viewport: &mut Viewport) -> Result<(), failure::Error> {
         let mut estimator = self.estimator.as_mut().ok_or(Error::NoneObject("estimator".to_string()))?;
         let mut grid = self.grid.as_mut().ok_or(Error::NoneObject("grid".to_string()))?;
 
         estimator.update(0.01);
-
-        let time_in_sec = SystemTime::now()
-            .duration_since(self.start_time)
-            .expect("Time went backwards")
-            .as_millis() as f32 / 1000.0_f32;
-        let t = time_in_sec;
 
         grid.update_vertices(|x, y| {
             estimator.get_val(x, y)

@@ -1,7 +1,7 @@
 use gl;
 use failure::err_msg;
 use std::path::Path;
-use crate::{debug, grid, render_gl, wave_estimator};
+use crate::{debug, render_gl};
 use crate::resources::Resources;
 use nalgebra_glm as glm;
 use crate::render_gl::Viewport;
