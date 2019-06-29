@@ -2,7 +2,7 @@ use gl;
 use failure;
 
 use crate::render_gl::{self, data, buffer};
-use crate::resources::Resources;
+use crate::render_gl::resources::Resources;
 
 #[derive(VertexAttribPointers)]
 #[derive(Copy, Clone, Debug)]

@@ -7,13 +7,12 @@ extern crate nalgebra_glm;
 
 use std::time::SystemTime;
 
-use crate::resources::Resources;
+use crate::render_gl::resources::Resources;
 use crate::render_gl::Viewport;
 use crate::wave_estimator::WaveEstimator;
 use crate::grid::Grid;
 
 pub mod render_gl;
-pub mod resources;
 mod triangle;
 mod game;
 mod grid;

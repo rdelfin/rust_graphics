@@ -1,4 +1,4 @@
-use crate::resources::{self, Resources};
+use crate::render_gl::resources::{self, Resources};
 use gl;
 use std;
 use std::ffi::{CStr, CString};
