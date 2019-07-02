@@ -1,5 +1,7 @@
 #[macro_use] extern crate failure;
 #[macro_use] extern crate render_gl_derive;
+#[macro_use] extern crate maplit;
+#[macro_use] extern crate lazy_static;
 
 extern crate gl;
 extern crate sdl2;
