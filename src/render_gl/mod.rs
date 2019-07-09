@@ -1,12 +1,14 @@
+mod color_buffer;
 mod shader;
 mod viewport;
-mod color_buffer;
 
-pub use self::shader::{Shader, Program, Error};
-pub use self::viewport::Viewport;
 pub use self::color_buffer::ColorBuffer;
+pub use self::shader::{Error, Program, Shader};
+pub use self::viewport::Viewport;
 
-pub mod data;
 pub mod buffer;
-pub mod uniform;
+pub mod data;
+pub mod loader;
 pub mod resources;
+pub mod uniform;
+pub mod util;
