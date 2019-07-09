@@ -12,4 +12,3 @@ pub mod data;
 pub mod loader;
 pub mod resources;
 pub mod uniform;
-pub mod util;
