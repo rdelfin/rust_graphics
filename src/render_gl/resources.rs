@@ -11,6 +11,8 @@ pub enum Error {
     FileContainsNil,
     #[fail(display = "Failed get executable path")]
     FailedToGetExePath,
+    #[fail(display = "Failed to read file as UTF-8")]
+    FailedToReadUTF8,
 }
 
 impl From<io::Error> for Error {
@@ -50,6 +52,16 @@ impl Resources {
         }
 
         Ok(unsafe { ffi::CString::from_vec_unchecked(buffer) })
+    }
+
+    pub fn load_str(&self, resource_name: &str) -> Result<String, Error> {
+        let mut file = fs::File::open(
+            resource_name_to_path(&self.root_path, resource_name)
+        )?;
+        let mut result_str = &mut "".to_string();
+        file.read_to_string(result_str).map_err(|_| Error::FailedToReadUTF8)?;
+
+        Ok(result_str.to_owned())
     }
 }
 
