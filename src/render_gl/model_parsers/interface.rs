@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use nalgebra_glm as glm;
 
 #[derive(Clone)]
@@ -27,5 +29,5 @@ impl ModelData {
 
 pub trait FormatInterpreter<Token> {
     fn lex(&self, data: &str) -> Vec<Token>;
-    fn parse(&self, tokens: Vec<Token>) -> ModelData;
+    fn parse(&self, tokens: Vec<Token>) -> HashMap<String, ModelData>;
 }

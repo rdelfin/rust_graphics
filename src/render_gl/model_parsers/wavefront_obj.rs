@@ -1,13 +1,39 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
+use std::fmt::{Display, Formatter};
 use std::iter::FromIterator;
+
+use nalgebra_glm as glm;
 
 use crate::render_gl::model_parsers::interface::{FormatInterpreter, ModelData};
 
 enum WavefrontObjToken {
-    STRING { v: String },
-    DECIMAL { v: f64 },
-    INTEGER { v: i64 },
-    NEW_LINE,
+    Vertex,
+    VertexNormal,
+    VertexTexture,
+    Group,
+    Face,
+    Decimal(f64),
+    Integer(i64),
+    NewLine,
+}
+
+impl Display for WavefrontObjToken {
+    fn fmt(&self, f: &mut Formatter) -> ::std::fmt::Result {
+        match *self {
+            WavefrontObjToken::Vertex => f.write_str("Vertex"),
+            WavefrontObjToken::VertexNormal => f.write_str("VertexNormal"),
+            WavefrontObjToken::VertexTexture => f.write_str("VertexTexture"),
+            WavefrontObjToken::Group => f.write_str("Group"),
+            WavefrontObjToken::Face => f.write_str("Face"),
+            WavefrontObjToken::Decimal(ref v) => {
+                return f.write_str(&format!("Decimal({})", v)[..]);
+            },
+            WavefrontObjToken::Integer(ref v) => {
+                return f.write_str(&format!("Integer({})", v)[..]);
+            },
+            WavefrontObjToken::NewLine => f.write_str("NewLine"),
+        }
+    }
 }
 
 lazy_static! {
@@ -68,8 +94,8 @@ impl FormatInterpreter<WavefrontObjToken> for WavefrontObjInterpreter {
         tokens
     }
 
-    fn parse(&self, tokens: Vec<WavefrontObjToken>) -> ModelData {
-        ModelData::new_empty()
+    fn parse(&self, tokens: Vec<WavefrontObjToken>) -> HashMap<String, ModelData> {
+        HashMap::new()
     }
 }
 
@@ -99,14 +125,32 @@ fn lex_string(data: &str) -> (Option<WavefrontObjToken>, &str) {
         loc += 1;
     }
 
-    (
-        if loc == 0 {
-            None
-        } else {
-            Some(WavefrontObjToken::STRING{v: data[..loc].to_string()})
+    if loc == 0 {
+        return (None, data);
+    }
+
+    let str_seg = &data[..loc];
+    
+    match str_seg {
+        "v" => {
+            return (Some(WavefrontObjToken::Vertex), &data[loc..])
         },
-        &data[loc..]
-    )
+        "vn" => {
+            return (Some(WavefrontObjToken::VertexNormal), &data[loc..])
+        },
+        "vt" => {
+            return (Some(WavefrontObjToken::VertexTexture), &data[loc..])
+        },
+        "g" => {
+            return (Some(WavefrontObjToken::Group), &data[loc..])
+        },
+        "f" => {
+            return (Some(WavefrontObjToken::Face), &data[loc..])
+        },
+        _ => {
+            return (None, data);
+        }
+    }
 }
 
 fn lex_decimal(data: &str) -> (Option<WavefrontObjToken>, &str) {
@@ -160,9 +204,9 @@ fn lex_decimal(data: &str) -> (Option<WavefrontObjToken>, &str) {
             None
         } else {
             Some(
-                WavefrontObjToken::DECIMAL{
-                    v: sign * data[..loc].parse::<f64>().unwrap()
-                }
+                WavefrontObjToken::Decimal(
+                    sign * data[..loc].parse::<f64>().unwrap()
+                )
             )
         },
         &data[loc..]
@@ -212,9 +256,9 @@ fn lex_integer(data: &str) -> (Option<WavefrontObjToken>, &str) {
             None
         } else {
             Some(
-                WavefrontObjToken::INTEGER{
-                    v: sign * data[..loc].parse::<i64>().unwrap()
-                }
+                WavefrontObjToken::Integer(
+                    sign * data[..loc].parse::<i64>().unwrap()
+                )
             )
         },
         &data[loc..]
@@ -228,7 +272,7 @@ fn lex_new_line(data: &str) -> (Option<WavefrontObjToken>, &str) {
     match curr_char {
         Some(c) => {
             if c == '\n' {
-                return (Some(WavefrontObjToken::NEW_LINE), &data[1..]);
+                return (Some(WavefrontObjToken::NewLine), &data[1..]);
             }
         },
         None => { },
