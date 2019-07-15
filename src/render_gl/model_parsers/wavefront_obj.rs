@@ -14,6 +14,7 @@ enum WavefrontObjToken {
     Face,
     Decimal(f64),
     Integer(i64),
+    StringVal(String),
     NewLine,
 }
 
@@ -31,6 +32,9 @@ impl Display for WavefrontObjToken {
             WavefrontObjToken::Integer(ref v) => {
                 return f.write_str(&format!("Integer({})", v)[..]);
             },
+            WavefrontObjToken::StringVal(ref v) => {
+                return f.write_str(&format!("StringVal({})", v)[..]);
+            }
             WavefrontObjToken::NewLine => f.write_str("NewLine"),
         }
     }
@@ -131,25 +135,16 @@ fn lex_string(data: &str) -> (Option<WavefrontObjToken>, &str) {
 
     let str_seg = &data[..loc];
     
-    match str_seg {
-        "v" => {
-            return (Some(WavefrontObjToken::Vertex), &data[loc..])
-        },
-        "vn" => {
-            return (Some(WavefrontObjToken::VertexNormal), &data[loc..])
-        },
-        "vt" => {
-            return (Some(WavefrontObjToken::VertexTexture), &data[loc..])
-        },
-        "g" => {
-            return (Some(WavefrontObjToken::Group), &data[loc..])
-        },
-        "f" => {
-            return (Some(WavefrontObjToken::Face), &data[loc..])
-        },
-        _ => {
-            return (None, data);
-        }
+    return match str_seg {
+        "v" =>  (Some(WavefrontObjToken::Vertex), &data[loc..]),
+        "vn" => (Some(WavefrontObjToken::VertexNormal), &data[loc..]),
+        "vt" => (Some(WavefrontObjToken::VertexTexture), &data[loc..]),
+        "g" =>  (Some(WavefrontObjToken::Group), &data[loc..]),
+        "f" =>  (Some(WavefrontObjToken::Face), &data[loc..]),
+        _ => (
+            Some(WavefrontObjToken::StringVal(data[..loc].to_string())),
+            &data[loc..],
+        ),
     }
 }
 
