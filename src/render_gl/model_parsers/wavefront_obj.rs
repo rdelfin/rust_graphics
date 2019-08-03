@@ -1,11 +1,12 @@
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Display, Formatter};
-use std::iter::FromIterator;
+use std::iter::{FromIterator, Iterator};
 
 use nalgebra_glm as glm;
 
 use crate::render_gl::model_parsers::interface::{FormatInterpreter, ModelData};
 
+#[derive(Clone)]
 enum WavefrontObjToken {
     Vertex,
     VertexNormal,
@@ -99,7 +100,125 @@ impl FormatInterpreter<WavefrontObjToken> for WavefrontObjInterpreter {
     }
 
     fn parse(&self, tokens: Vec<WavefrontObjToken>) -> HashMap<String, ModelData> {
-        HashMap::new()
+        let mut points: Vec<glm::Vec3> = vec![];
+        let mut normals: Vec<glm::Vec3> = vec![];
+        let mut models = HashMap::new();
+        let mut curr_model: Option<String> = None;
+
+        let mut iter = tokens.iter();
+        let mut opt_token: Option<&WavefrontObjToken> = iter.next();
+
+        let is_decimal = |t: WavefrontObjToken| match t {
+            WavefrontObjToken::Decimal(_) => true,
+            _ => false,
+        };
+        let is_integer = |t: WavefrontObjToken| match t {
+            WavefrontObjToken::Integer(_) => true,
+            _ => false,
+        };
+        let is_string = |t: WavefrontObjToken| match t {
+            WavefrontObjToken::StringVal(_) => true,
+            _ => false,
+        };
+
+        while opt_token.is_some() {
+            let token = opt_token
+                .expect("Token said it was some but returned none");
+
+            match token {
+                WavefrontObjToken::Vertex => {
+                    let vertex_tokens = ingest_until_eol(&mut iter);
+                    if vertex_tokens.len() != 3 || !vertex_tokens.into_iter().all(is_decimal) {
+                        return models;
+                    }
+                    let WavefrontObjToken::Decimal(x) = vertex_tokens[0];
+                    let WavefrontObjToken::Decimal(y) = vertex_tokens[1];
+                    let WavefrontObjToken::Decimal(z) = vertex_tokens[2];
+
+                    points.push(glm::vec3(x as f32, y as f32, z as f32))
+                },
+                WavefrontObjToken::VertexNormal => {
+                    let vertex_tokens = ingest_until_eol(&mut iter);
+                    if vertex_tokens.len() != 3 || !vertex_tokens.into_iter().all(is_decimal) {
+                        return models;
+                    }
+                    let WavefrontObjToken::Decimal(x) = vertex_tokens[0];
+                    let WavefrontObjToken::Decimal(y) = vertex_tokens[1];
+                    let WavefrontObjToken::Decimal(z) = vertex_tokens[2];
+
+                    normals.push(glm::vec3(x as f32, y as f32, z as f32))
+                },
+                WavefrontObjToken::VertexTexture => {
+                    // We're not doing anything with this data, so just validate
+                    let vertex_tokens = ingest_until_eol(&mut iter);
+                    if vertex_tokens.len() != 3 || !vertex_tokens.into_iter().all(is_decimal) {
+                        return models;
+                    }
+                },
+                WavefrontObjToken::Group => {
+                    let vertex_tokens = ingest_until_eol(&mut iter);
+                    if vertex_tokens.len() != 1 || !is_string(vertex_tokens[0]) {
+                        return models;
+                    }
+                    let WavefrontObjToken::StringVal(name) = vertex_tokens[0];
+                    models.insert(name.clone(), ModelData::new_empty());
+                    models[&name].name = name.clone();
+                    curr_model = Some(name.clone());
+                },
+                WavefrontObjToken::Face => {
+                    let vertex_tokens = ingest_until_eol(&mut iter);
+                    if !vertex_tokens.into_iter().all(is_integer) {
+                        return models;
+                    }
+
+                    if vertex_tokens.len() == 4 {
+                        let WavefrontObjToken::Integer(x) = vertex_tokens[0];
+                        let WavefrontObjToken::Integer(y) = vertex_tokens[1];
+                        let WavefrontObjToken::Integer(z) = vertex_tokens[3];
+                        let WavefrontObjToken::Integer(w) = vertex_tokens[3];
+
+                        let model_name = curr_model.unwrap();
+
+                        models[&model_name].points.push(points[(x+1) as usize]);
+                        models[&model_name].points.push(points[(y+1) as usize]);
+                        models[&model_name].points.push(points[(z+1) as usize]);
+                        models[&model_name].points.push(points[(x+1) as usize]);
+                        models[&model_name].points.push(points[(z+1) as usize]);
+                        models[&model_name].points.push(points[(w+1) as usize]);
+
+                        models[&model_name].normals.push(normals[(x+1) as usize]);
+                        models[&model_name].normals.push(normals[(y+1) as usize]);
+                        models[&model_name].normals.push(normals[(z+1) as usize]);
+                        models[&model_name].normals.push(normals[(x+1) as usize]);
+                        models[&model_name].normals.push(normals[(z+1) as usize]);
+                        models[&model_name].normals.push(normals[(w+1) as usize]);
+                    } else if vertex_tokens.len() == 3 {
+                        let WavefrontObjToken::Integer(x) = vertex_tokens[0];
+                        let WavefrontObjToken::Integer(y) = vertex_tokens[1];
+                        let WavefrontObjToken::Integer(z) = vertex_tokens[3];
+
+                        let model_name = curr_model.unwrap();
+
+                        models[&model_name].points.push(points[(x+1) as usize]);
+                        models[&model_name].points.push(points[(y+1) as usize]);
+                        models[&model_name].points.push(points[(z+1) as usize]);
+
+                        models[&model_name].normals.push(normals[(x+1) as usize]);
+                        models[&model_name].normals.push(normals[(y+1) as usize]);
+                        models[&model_name].normals.push(normals[(z+1) as usize]);
+                    } else {
+                        return models;
+                    }
+                },
+                _ => {
+                    panic!(format!("Unrecognized start of line: {}", token))
+                }
+            }
+
+            opt_token = iter.next();
+        }
+
+        models
     }
 }
 
@@ -298,4 +417,29 @@ fn lex_whitespace(data: &str) -> (&str) {
     }
 
     &data[loc..]
+}
+
+fn ingest_until_eol<'a, I>(
+    iter: &mut I
+) -> Vec<WavefrontObjToken> where I: Iterator<Item = &'a WavefrontObjToken> {
+    let mut tokens: Vec<WavefrontObjToken> = vec![];
+    let opt_token = iter.next();
+
+    while opt_token.is_some() {
+        let token = opt_token
+            .expect("Token said it was some but returned none");
+
+        match token {
+            WavefrontObjToken::NewLine => {
+                break;
+            }
+            _ => {
+                tokens.push(*token);
+            }
+        }
+
+        opt_token = iter.next();
+    }
+
+    tokens
 }
